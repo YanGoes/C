@@ -1,0 +1,22 @@
+#include<stdio.h>
+#include <math.h>
+struct Ponto {
+  float x;
+  float y;
+};
+int main() {
+  float resultado;
+  struct Ponto ponto1;
+  printf("Digite a ordenada: \n");
+  scanf("%f", &ponto1.x);
+  printf("Digite a ordenada: \n");
+  scanf("%f", &ponto1.y);
+  struct Ponto ponto2;
+  printf("Digite a abscissa: \n");
+  scanf("%f", &ponto2.x);
+  printf("Digite a abscissa: \n");
+  scanf("%f", &ponto2.y);
+  resultado = sqrt(pow ((ponto2.x-ponto1.x),2) + pow((ponto2.y-ponto1.y),2));
+  printf("A distancia entre os dois pontos digitados e: %f",resultado);
+  return 0;
+  }
