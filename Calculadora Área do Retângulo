@@ -1,0 +1,18 @@
+#include<stdio.h>
+#include<math.h>
+struct Retangulo {
+  float largura;
+  float altura;
+};
+int main() {
+   float area, perimetro;
+   struct Retangulo retangulo;
+  printf("Digite o valor da largura: \n");
+  scanf("%f", &retangulo.largura);
+  printf("Digite o valor da altura: \n");
+  scanf("%f", &retangulo.altura);
+  area = retangulo.largura * retangulo.altura;
+  perimetro = 2 * (retangulo.largura + retangulo.altura);
+  printf("A area e o perimetro dos valores digitados sao respectivamente: %f e %f", area, perimetro);
+  return 0;
+  }
