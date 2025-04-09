@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    char valor;
+    struct Node* proximo;
+};
+
+void adicionarNo(struct Node** cabeca, char novoValor) {
+    struct Node* novoNo = (struct Node*)malloc(sizeof(struct Node));
+    novoNo->valor = novoValor;
+    novoNo->proximo = NULL;
+
+    if (*cabeca == NULL) {
+        *cabeca = novoNo;
+    } else {
+        struct Node* atual = *cabeca;
+        while (atual->proximo != NULL) {
+            atual = atual->proximo;
+        }
+        atual->proximo = novoNo;
+    }
+}
+
+struct Node* concatenarListas(struct Node* lista1, struct Node* lista2) {
+    if (lista1 == NULL) return lista2;
+    if (lista2 == NULL) return lista1;
+
+
+    struct Node* atual = lista1;
+    while (atual->proximo != NULL) {
+        atual = atual->proximo;
+    }
+    atual->proximo = lista2;
+    return lista1;
+}
+
+void exibirLista(struct Node* cabeca) {
+    struct Node* atual = cabeca;
+    while (atual != NULL) {
+        printf("%c ", atual->valor);
+        atual = atual->proximo;
+    }
+    printf("\n");
+}
+
+int main() {
+    struct Node* Lista1 = NULL;
+    struct Node* Lista2 = NULL;
+
+    char item;
+
+    for (int i = 0; i < 5; i++) {
+        printf("Liste os itens da lista 1: ");
+        scanf(" %c", &item);
+        adicionarNo(&Lista1, item);
+    }
+
+    printf("\nA lista 1 registrada e: ");
+    exibirLista(Lista1);
+
+    for (int i = 0; i < 5; i++) {
+        printf("Liste os itens da lista 2: ");
+        scanf(" %c", &item);
+        adicionarNo(&Lista2, item);
+    }
+
+    printf("\nA lista 2 registrada e: ");
+    exibirLista(Lista2);
+
+    struct Node* ListaConcatenada = concatenarListas(Lista1, Lista2);
+
+    printf("A concatenacao das duas listas e: ");
+    exibirLista(ListaConcatenada);
+
+    return 0;
+}
