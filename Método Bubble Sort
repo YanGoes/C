@@ -1,0 +1,36 @@
+#include <stdio.h>
+
+int main(void) {
+    int x[6];  // Array para armazenar os valores
+    int i, j, temp;  // Variáveis auxiliares
+
+    printf("Ordenador de valores (Bubble Sort)\n");
+    printf("Digite 6 números aleatórios:\n");
+
+    // Entrada dos valores no array
+    for (i = 0; i < 6; i++) {
+        printf("Digite o número %d: ", i + 1);
+        scanf("%d", &x[i]);
+    }
+
+    // Algoritmo Bubble Sort
+    for (i = 0; i < 6 - 1; i++) {          // Loop externo (passadas)
+        for (j = 0; j < 6 - i - 1; j++) {  // Loop interno (comparações)
+            if (x[j] > x[j + 1]) {         // Comparar elementos adjacentes
+                // Troca dos elementos
+                temp = x[j];
+                x[j] = x[j + 1];
+                x[j + 1] = temp;
+            }
+        }
+    }
+
+    // Exibir os valores ordenados
+    printf("\nValores ordenados:\n");
+    for (i = 0; i < 6; i++) {
+        printf("%d ", x[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
