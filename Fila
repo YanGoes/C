@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 10
+
+typedef struct {
+    int itens[MAX];
+    int frente, tras;
+} Fila;
+
+void inicializarFila(Fila *f) {
+    f->frente = 0;
+    f->tras = -1;
+}
+
+int FilaCheia(Fila *f) {
+    return f->tras == MAX - 1;
+}
+
+int FilaVazia(Fila *f) {
+    return f->frente > f->tras;
+}
+
+void Enfileirar(Fila *f, int valor) {
+    if (!FilaCheia(f)) {
+        f->itens[++f->tras] = valor;
+        printf("Valor %d foi enfileirado\n", valor);
+    } else {
+        printf("Fila cheia!\n");
+    }
+}
+
+int Desenfileirar(Fila *f) {
+    if (!FilaVazia(f)) {
+        return f->itens[f->frente++];
+    } else {
+        printf("Fila vazia!\n");
+        return -1;
+    }
+}
+
+void ExibirFila(Fila *f) {
+    if (FilaVazia(f)) {
+        printf("A fila está vazia!\n");
+        return;
+    }
+    
+    printf("Elementos na fila: ");
+    for (int i = f->frente; i <= f->tras; i++) {
+        printf("%d ", f->itens[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    Fila f;
+    int opcao, valor;
+
+    inicializarFila(&f);
+
+    do {
+        printf("\nManda a Fila ae pae:\n");
+        printf("\n1. Enfileirar\n");
+        printf("2. Desenfileirar\n");
+        printf("3. Exibir Fila\n");
+        printf("4. Vamo pra casa pae\n");
+        printf("Escolha uma opcao: \n");
+        scanf("\n%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                printf("Digite um valor para enfileirar: \n");
+                scanf("%d", &valor);
+                Enfileirar(&f, valor);
+                break;
+            case 2:
+                valor = Desenfileirar(&f);
+                if (valor != -1) { // Verifica se a fila não estava vazia
+                    printf("Desinfileirado: %d\n", valor);
+                }
+                break;
+            case 3:
+                ExibirFila(&f);
+                break;
+            case 4:
+                printf("Valeu pae, vamo pra casa\n");
+                break;
+            default:
+                printf("Opcao invalida! Tente novamente.\n");
+        }
+    } while (opcao != 4);
+
+    return 0;
+}
