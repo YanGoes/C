@@ -1,0 +1,33 @@
+#include<stdio.h>
+#include<math.h>
+struct Data {
+  int dia;
+  int mes;
+  int ano;
+};
+int main() {
+   struct Data data;
+   printf("Digite um dia: \n");
+   scanf("%d", &data.dia);
+   printf("Digite o numero do mes: \n");
+   scanf("%d", &data.mes);
+   printf("Digite o ano: \n");
+   scanf("%d", &data.ano);
+   int dataValida = 1;
+   if (data.dia<1 || data.dia>31) {
+       dataValida=0;
+   }
+   if (data.mes<1 || data.dia>12) {
+       dataValida=0;
+   }
+   if (data.mes == 2) {
+       if (data.dia > 28) {
+           dataValida = 0;
+       }
+   }
+       if (dataValida) {
+           printf("A data digitada existe.");
+       } else
+           printf("A data digitada nao existe.");
+       return 0;
+   }
