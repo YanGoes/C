@@ -1,0 +1,367 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Definições de constantes para o número máximo de produtos e itens no carrinho
+#define ProdutosMax 50
+#define CarrinhoMax 50
+#define TabelaHashSize 100  // Tamanho da tabela hash
+
+// Estrutura para representar um produto
+typedef struct {
+    int codigo;
+    char nome[30];
+    float preco;
+    int QuantidadeEstoque;
+} Produto;
+
+// Estrutura para representar um nó da lista encadeada (usada na tabela hash)
+typedef struct NodoProduto {
+    Produto produto;
+    struct NodoProduto* proximo;
+} NodoProduto;
+
+// Tabela hash para armazenar os produtos
+NodoProduto* tabelaHash[TabelaHashSize];
+
+// Estrutura para representar um item no carrinho de compras
+typedef struct {
+    Produto produto;
+    int quantidade;
+} Carrinho;
+
+// Arrays globais para armazenar produtos e itens no carrinho
+Produto produtos[ProdutosMax];     // Array para armazenar produtos cadastrados
+Carrinho carrinho[CarrinhoMax];     // Array para armazenar itens no carrinho
+
+// Contadores globais para o total de produtos e itens no carrinho
+int TotalProdutos = 0;              // Contador de produtos cadastrados
+int TotalCarrinho = 0;              // Contador de itens no carrinho
+
+// Funções auxiliares de tabela hash
+int FuncaoHash(int codigo);
+void InserirProdutoNaTabelaHash(Produto novoProduto);
+Produto* BuscarProdutoNaTabelaHash(int codigo);
+
+// Prototipagem das funções
+void Menu();
+void CadastrarProduto();
+void ListarProdutos();
+void ComprarProduto();
+void VisualizarCarrinho();
+void FecharPedido();
+int TemNoCarrinho(int codigo);
+Produto* PegarProdutoPorCodigo(int codigo);
+void InfoProduto(Produto prod);
+
+int main() {
+    // Inicializa a tabela hash (todos os elementos são NULL)
+    for (int i = 0; i < TabelaHashSize; i++) {
+        tabelaHash[i] = NULL;
+    }
+
+    Menu(); // Chama a função Menu para iniciar o programa
+    return 0;
+}
+
+// Função hash para calcular o índice na tabela
+int FuncaoHash(int codigo) {
+    return codigo % TabelaHashSize;  // Função hash simples
+}
+
+// Insere o produto na tabela hash
+void InserirProdutoNaTabelaHash(Produto novoProduto) {
+    int indice = FuncaoHash(novoProduto.codigo); // Calcula o índice usando o código do produto
+   
+    // Cria um novo nó para o produto
+    NodoProduto* novoNodo = (NodoProduto*)malloc(sizeof(NodoProduto));
+    novoNodo->produto = novoProduto;
+    novoNodo->proximo = NULL;
+   
+    // Insere na lista encadeada no índice calculado
+    if (tabelaHash[indice] == NULL) {
+        tabelaHash[indice] = novoNodo;
+    } else {
+        NodoProduto* atual = tabelaHash[indice];
+        while (atual->proximo != NULL) {
+            atual = atual->proximo;
+        }
+        atual->proximo = novoNodo;
+    }
+}
+
+// Busca um produto na tabela hash
+Produto* BuscarProdutoNaTabelaHash(int codigo) {
+    int indice = FuncaoHash(codigo); // Calcula o índice usando o código do produto
+   
+    NodoProduto* atual = tabelaHash[indice];
+    while (atual != NULL) {
+        if (atual->produto.codigo == codigo) {
+            return &atual->produto; // Retorna o ponteiro para o produto
+        }
+        atual = atual->proximo;
+    }
+   
+    return NULL; // Retorna NULL se o produto não for encontrado
+}
+
+void Menu() {
+    int opcao;             // Variável para armazenar a opção escolhida pelo usuário
+    do {
+        printf("\n\n=== MERCADINHO DO SEU MEINUEL ===\n\n");
+        printf("Menu:\n");
+        printf("1. Cadastrar Produto\n");
+        printf("2. Listar Produtos\n");
+        printf("3. Comprar Produto\n");
+        printf("4. Visualizar Carrinho\n");
+        printf("5. Fechar Pedido\n");
+        printf("6. Sair\n\n");
+        printf("O que deseja fazer: ");
+        scanf("%d", &opcao);   // Lê a opção escolhida pelo usuário
+   
+        switch(opcao) {       // Verifica a opção escolhida
+            case 1: CadastrarProduto(); break;   // Chama função de cadastro de produto
+            case 2: ListarProdutos(); break;     // Chama função para listar produtos
+            case 3: ComprarProduto(); break;      // Chama função para comprar produtos
+            case 4: VisualizarCarrinho(); break;  // Chama função para visualizar o carrinho
+            case 5: FecharPedido(); break;        // Chama função para fechar o pedido
+            case 6: printf("\nObrigado por comprar conosco, volte sempre!\n\n"); break; // Mensagem de despedida ao sair
+            default: printf("\nEssa opicao nao existe. Tente outra.\n"); // Mensagem de erro se a opção não for válida
+        }
+    } while (opcao != 6);   // Continua até que o usuário escolha sair (opção 6)
+}
+
+void CadastrarProduto() {
+    if (TotalProdutos >= ProdutosMax) {   // Verifica se o limite de produtos foi atingido
+        printf("Limite de produtos cadastrados atingido!\n");
+        return;
+    }
+   
+    Produto novoProduto;   // Cria uma nova variável do tipo Produto
+   
+    novoProduto.codigo = TotalProdutos + 1;   // Atribui um código único ao novo produto
+   
+    getchar();   // Limpa o buffer do teclado (para evitar problemas com fgets)
+   
+    printf("\nDigite o nome do produto: ");
+    fgets(novoProduto.nome, sizeof(novoProduto.nome), stdin);   // Lê o nome do produto
+   
+    novoProduto.nome[strcspn(novoProduto.nome, "\n")] = '\0';   // Remove a nova linha do final da string
+   
+    printf("\nDigite o preco do produto: R$");
+    scanf("%f", &novoProduto.preco);   // Lê o preço do produto
+   
+    printf("\nDigite a quantidade em estoque: ");
+    scanf("%d", &novoProduto.QuantidadeEstoque);   // Lê a quantidade em estoque
+   
+    // Insere o novo produto na tabela hash
+    InserirProdutoNaTabelaHash(novoProduto);
+   
+    produtos[TotalProdutos++] = novoProduto;   // Adiciona o novo produto ao array e incrementa o contador
+   
+    printf("\nProduto cadastrado com sucesso! Codigo do produto: %d\n", novoProduto.codigo);
+}
+
+void ListarProdutos() {
+    if (TotalProdutos == 0) {   // Verifica se não há produtos cadastrados
+        printf("\nNenhum produto cadastrado.\n");
+        return;
+    }
+
+    printf("\n\n--- PRODUTOS CADASTRADOS ---\n\n");
+   
+    // Listando produtos utilizando a tabela hash
+    for (int i = 0; i < TabelaHashSize; i++) {
+        NodoProduto* atual = tabelaHash[i];
+        while (atual != NULL) {
+            InfoProduto(atual->produto);   // Exibe as informações do produto
+            atual = atual->proximo;
+        }
+    }
+}
+
+void InfoProduto(Produto prod) {
+    printf("\nCodigo: %d | Nome: %s | Preco: R$ %.2f | Estoque: %d\n",
+           prod.codigo, prod.nome, prod.preco, prod.QuantidadeEstoque);
+}
+
+void ComprarProduto() {
+    ListarProdutos();   // Exibe os produtos disponíveis para compra
+
+    int codigo;
+    printf("\nDigite o codigo do produto que deseja comprar: ");
+    scanf("%d", &codigo);   // Lê o código do produto desejado
+
+
+    // Busca o produto pelo código fornecido pelo usuário.
+    Produto* produto = BuscarProdutoNaTabelaHash(codigo);
+
+    if (produto == NULL) {   // Verifica se o produto foi encontrado
+        printf("\nProduto nao encontrado! Selecione outro produto da lista ou cadastre esse produto, no menu 1.\n");
+        return;
+    }
+   
+    int quantidadeDesejada;
+    printf("\nA quantidade disponivel em estoque: %d\n", produto->QuantidadeEstoque);
+   
+    printf("\nQuantos desse produto voce deseja comprar? \n");
+    scanf("%d", &quantidadeDesejada);   // Lê a quantidade desejada pelo usuário
+   
+    if (quantidadeDesejada > produto->QuantidadeEstoque) {   // Verifica se a quantidade desejada é maior que a disponível
+        printf("Quantidade desejada maior que o estoque disponivel!\n");
+        return;
+    }
+
+    int x = TemNoCarrinho(codigo);   // Verifica se o produto já está no carrinho
+       
+    if (x != -1) {   // Se já estiver no carrinho, apenas atualiza a quantidade
+        carrinho[x].quantidade += quantidadeDesejada;
+        printf("\nA quantidade do produto %s aumentou para %d.\n", produto->nome, carrinho[x].quantidade);
+        produto->QuantidadeEstoque -= quantidadeDesejada;   // Atualiza o estoque após a compra
+       
+    } else {   // Se não estiver no carrinho, adiciona um novo item ao carrinho
+        if (TotalCarrinho >= CarrinhoMax) {   // Verifica se o limite de itens no carrinho foi atingido
+            printf("\nLimite de produtos no carrinho atingido!\n");
+            return;
+        }
+       
+        carrinho[TotalCarrinho].produto = *produto;   // Adiciona o produto ao carrinho
+        carrinho[TotalCarrinho].quantidade = quantidadeDesejada;   // Define a quantidade comprada
+       
+        TotalCarrinho++;   // Incrementa o total de itens no carrinho
+       
+        produto->QuantidadeEstoque -= quantidadeDesejada;   // Atualiza o estoque após a compra
+       
+        printf("\nO produto %s foi adicionado ao carrinho.\n", produto->nome);
+    }
+}
+
+void VisualizarCarrinho() {
+    if (TotalCarrinho == 0) {   // Verifica se o carrinho está vazio
+        printf("\nO carrinho esta vazio. Escolha um produto e adicione ele ao seu carrinho.\n");
+        return;
+    }
+
+    printf("\n\n==== SEU CARRINHO DE COMPRAS ====\n\n");
+   
+    float total = 0;
+    for (int i = 0; i < TotalCarrinho; i++) {   // Percorre todos os itens no carrinho
+        InfoProduto(carrinho[i].produto);   // Exibe as informações dos produtos no carrinho
+        printf("Quantidade comprada: %d\n", carrinho[i].quantidade);
+        total += carrinho[i].produto.preco * carrinho[i].quantidade;
+    }
+   
+    printf("\nTotal do carrinho: R$ %.2f\n", total);
+}
+
+void FecharPedido() {
+    int FormaDePagamento;     // Variável para armazenar a forma de pagamento escolhida pelo usuário
+    int Resposta;             // Variável para armazenar resposta sobre parcelamento
+    int Parcelas;             // Variável para armazenar número de parcelas
+
+    if (TotalCarrinho == 0) {   // Verifica se há itens no carrinho antes de fechar pedido
+        printf("\nO carrinho esta sem nenhum item! Nao e possivel fechar o pedido.\n");
+        return;
+    }
+
+    float total = 0.0f;
+
+    printf("\n\n--- CUPOM DA COMPRA ---\n\n");
+
+    for(int i = 0; i < TotalCarrinho; i++) {  
+        float subtotal = carrinho[i].produto.preco * carrinho[i].quantidade;  
+        total += subtotal;
+
+        printf("\n %s | Preco: R$ %.2f | Quantidade: %d | Subtotal: R$ %.2f\n",
+               carrinho[i].produto.nome,
+               carrinho[i].produto.preco,
+               carrinho[i].quantidade,
+               subtotal);
+    }
+
+    printf("\nGostaria de aplicar um cupom de desconto? (1 - Sim / 2 - Nao)\n");
+    int CupomDeDesconto;
+    scanf("%d", &CupomDeDesconto);  
+
+    float desconto = 0.0f;
+
+    if(CupomDeDesconto == 1) {
+        char cupom[30];  
+        getchar();  
+        int cupomValido = 0;
+
+        while (!cupomValido) {
+            printf("\nO cupom que voce ira colocar sera 'WELDES20'.\n\n");
+            printf("Digite o cupom de desconto que lhe passamos acima: \n");
+            fgets(cupom, sizeof(cupom), stdin);  
+            cupom[strcspn(cupom, "\n")] = '\0';  
+
+            if(strcmp(cupom, "WELDES20") == 0) {  
+                desconto = total * 0.20;  
+                printf("Cupom aplicado! Voce recebeu um desconto de R$ %.2f\n\n", desconto);
+                total -= desconto;  
+                cupomValido = 1;
+            } else {
+                printf("Cupom invalido! Tente novamente ou digite 'sair' para cancelar\n");
+                char opcao[10];
+                printf("Deseja tentar novamente? (Sim / Nao): ");
+                fgets(opcao, sizeof(opcao), stdin);
+                opcao[strcspn(opcao, "\n")] = '\0';
+                if (strcmp(opcao, "N") == 0 || strcmp(opcao, "nao") == 0) {
+                    printf("Operação cancelada.\n");
+                    return;
+                }
+            }
+        }
+    }
+
+    printf("O valor total da compra apos o desconto: R$ %.2f\n", total);
+
+    printf("\nQual sera a forma de pagamento:\n\n 1-Debito\n 2-Credito\n 3-PIX\n\n");
+    scanf("%d", &FormaDePagamento);
+
+    if(FormaDePagamento == 1) {
+        printf("Opcao escolhida foi o debito. So aproximar ou inserir o cartao.");
+        TotalCarrinho = 0;  
+    } else if(FormaDePagamento == 3) {
+        printf("\nO PIX para pagamento é o numero (61) 971654518.");
+        TotalCarrinho = 0;  
+    }
+   
+    if (FormaDePagamento == 2) {
+        printf("\nGostaria de dividir esse valor? (1 - Sim / 2 - Nao)\n\n");
+        scanf("%d", &Resposta);
+
+        if (Resposta == 1) {
+            printf("\nConseguimos dividir em ate 5 vezes, deseja dividir em quantas vezes?\n\n");
+            scanf("%d", &Parcelas);
+
+            switch (Parcelas) {
+                case 1:
+                    printf("\nDividindo em 1 vez, o valor de cada parcela ficou R$%.2f\n", total/1); break;
+                case 2:
+                    printf("\nDividindo em 2 vezes, o valor de cada parcela ficou R$%.2f\n", total/2); break;
+                case 3:
+                    printf("\nDividindo em 3 vezes, o valor de cada parcela ficou R$%.2f\n", total/3); break;
+                case 4:
+                    printf("\nDividindo em 4 vezes, o valor de cada parcela ficou R$%.2f\n", total/4); break;
+                case 5:
+                    printf("\nDividindo em 5 vezes, o valor de cada parcela ficou R$%.2f\n", total/5); break;
+                default:
+                    printf("\nEscolha uma opcao de parcelamento correta.\n"); break;
+            }
+        }
+       
+        printf("\nValor total da compra: R$ %.2f\n", total);
+        TotalCarrinho = 0;  
+    }
+}
+
+int TemNoCarrinho(int codigo) {
+    for(int i = 0; i < TotalCarrinho; i++) {  
+        if(carrinho[i].produto.codigo == codigo) {  
+            return i;   // Retorna índice se já estiver no carrinho
+        }
+    }
+    return -1;     // Retorna -1 se não estiver no carrinho
+}
