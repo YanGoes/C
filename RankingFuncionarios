@@ -1,0 +1,64 @@
+#include <stdio.h>
+
+// Estrutura para representar um funcionário
+struct Funcionario {
+    char nome[100];  // Nome do funcionário
+    int idade;       // Idade do funcionário
+    float salario;   // Salário do funcionário
+    char cargo[100]; // Cargo do funcionário
+};
+
+int main() {
+    // Variável para armazenar o funcionário com o maior salário
+    struct Funcionario resultado;
+
+    // Variáveis para armazenar os dados dos três funcionários
+    struct Funcionario funcionario1, funcionario2, funcionario3;
+
+    // Entrada dos dados do primeiro funcionário
+    printf("Digite seu nome: \n");
+    scanf("%s", funcionario1.nome); // Lê o nome do funcionário
+    printf("Digite sua idade: \n");
+    scanf("%d", &funcionario1.idade); // Lê a idade do funcionário
+    printf("Digite seu salario: \n");
+    scanf("%f", &funcionario1.salario); // Lê o salário do funcionário
+    printf("Digite seu cargo: \n");
+    scanf("%s", &funcionario1.cargo); // Lê o cargo do funcionário
+
+    // Entrada dos dados do segundo funcionário
+    printf("Digite seu nome: \n");
+    scanf("%s", &funcionario2.nome); // Lê o nome do funcionário
+    printf("Digite sua idade: \n");
+    scanf("%d", &funcionario2.idade); // Lê a idade do funcionário
+    printf("Digite seu salario: \n");
+    scanf("%f", &funcionario2.salario); // Lê o salário do funcionário
+    printf("Digite seu cargo: \n");
+    scanf("%s", funcionario2.cargo); // Lê o cargo do funcionário
+
+    // Entrada dos dados do terceiro funcionário
+    printf("Digite seu nome: \n");
+    scanf("%s", funcionario3.nome); // Lê o nome do funcionário
+    printf("Digite sua idade: \n");
+    scanf("%d", &funcionario3.idade); // Lê a idade do funcionário
+    printf("Digite seu salario: \n");
+    scanf("%f", &funcionario3.salario); // Lê o salário do funcionário
+    printf("Digite seu cargo: \n");
+    scanf("%s", funcionario3.cargo); // Lê o cargo do funcionário
+
+    // Determina o funcionário com o maior salário
+    if (funcionario1.salario > funcionario2.salario && funcionario1.salario > funcionario3.salario) {
+        // Se o salário do primeiro funcionário for o maior, atribui-o à variável resultado
+        resultado = funcionario1;
+    } else if (funcionario2.salario > funcionario1.salario && funcionario2.salario > funcionario3.salario) {
+        // Se o salário do segundo funcionário for o maior, atribui-o à variável resultado
+        resultado = funcionario2;
+    } else {
+        // Caso contrário, o terceiro funcionário tem o maior salário
+        resultado = funcionario3;
+    }
+
+    // Exibe o funcionário com o maior salário
+    printf("O funcionario que possui o maior salario e: %s com salario de %.2f com o cargo de %s", resultado.nome, resultado.salario, resultado.cargo);
+
+    return 0; // Retorna sucesso ao final da execução
+}
