@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    char valor;
+    struct Node* proximo;
+};
+
+void adicionarNo(struct Node** inicio, char novoValor) {
+    struct Node* novoNo = (struct Node*)malloc(sizeof(struct Node));
+    novoNo->valor = novoValor;
+    novoNo->proximo = *inicio;
+    *inicio = novoNo;
+}
+
+void inicializarLista(struct Node** inicio) {
+    *inicio = NULL;
+}
+
+int buscarNaLista(struct Node* inicio, char item) {
+    struct Node* atual = inicio;
+    while (atual != NULL) {
+        if (atual->valor == item) {
+            return 1;
+        }
+        atual = atual->proximo;
+    }
+    return 0;
+}
+
+int main() {
+    struct Node* minhaLista;
+    inicializarLista(&minhaLista);
+    char item;
+    int i;
+
+    for (i = 0; i < 10; i++) {
+        printf("Liste os itens a seguir: ");
+        scanf(" %c", &item);
+        adicionarNo(&minhaLista, item);
+    }
+
+    printf("\nA lista registrada e: ");
+    struct Node* atual = minhaLista;
+    while(atual != NULL){
+        printf("%c ", atual->valor);
+        atual = atual->proximo;
+    }
+   
+    printf("\n\n");
+
+    if (buscarNaLista(minhaLista, 'x')){
+        printf("O item x esta na lista\n");
+    } else {
+        printf("O item x nao esta na lista\n");
+    }
+
+    return 0;
+}
